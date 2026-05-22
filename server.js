@@ -46,7 +46,8 @@ app.use(cors({
 }));
 
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -61,22 +62,22 @@ app.get('/api/uploads-debug', (req, res) => {
     const fs = require('fs');
     try {
         const uploadDir = path.join(__dirname, 'uploads');
-        
+
         // List parent directory to see what's there
         const parentFiles = fs.readdirSync(__dirname);
-        
+
         // Auto-create uploads directory if it doesn't exist
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
-        
+
         const files = fs.readdirSync(uploadDir);
-        res.json({ 
-            exists: true, 
-            path: uploadDir, 
+        res.json({
+            exists: true,
+            path: uploadDir,
             files,
             parentPath: __dirname,
-            parentFiles 
+            parentFiles
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
