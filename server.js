@@ -26,7 +26,8 @@ const allowedOrigins = [
     'https://bluebreery-frontend-2u3j.onrender.com', // Older Render Frontend
     'https://bluebreery-frontend.onrender.com',    // Possible alternate
     'http://localhost:3000',                        // Local Development
-    'http://localhost:5001'                         // Local Backend Debug
+    'http://localhost:5001',                         // Local Backend Debug
+    'https://blueberries-mens-and-boys.onrender.com',
 ];
 
 app.use(cors({
