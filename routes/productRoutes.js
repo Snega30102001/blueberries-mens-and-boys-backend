@@ -15,6 +15,7 @@ router.get('/lite/search', async (req, res) => {
             const products = localDB.getAll('products');
 
             const liteProducts = products.slice(0, 100).map((p) => ({
+                _id: p._id,
                 name: p.name,
                 slug: p.slug,
                 category: p.category,
