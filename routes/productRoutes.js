@@ -6,6 +6,52 @@ const localDB = require('../utils/localDB');
 
 const isConnected = () => mongoose.connection.readyState === 1;
 
+// Fast lightweight products for navbar/search
+router.get('/lite/search', async (req, res) => {
+    try {
+
+        if (!isConnected()) {
+
+            const products = localDB.getAll('products');
+
+            const liteProducts = products.slice(0, 100).map((p) => ({
+                _id: p._id,
+                name: p.name,
+                slug: p.slug,
+                category: p.category,
+                subcategory: p.subcategory,
+                brand: p.brand,
+                price: p.price,
+                images: p.images?.[0] ? [p.images[0]] : [],
+            }));
+
+            return res.json(liteProducts);
+        }
+
+        const products = await Product.find(
+            {},
+            {
+                name: 1,
+                slug: 1,
+                category: 1,
+                subcategory: 1,
+                brand: 1,
+                price: 1,
+                images: { $slice: 1 },
+            }
+        )
+            .limit(100)
+            .lean();
+
+        res.json(products);
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+});
+
 // Get all products
 router.get('/', async (req, res) => {
     try {
