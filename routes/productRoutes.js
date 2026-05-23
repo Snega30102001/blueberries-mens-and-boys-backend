@@ -15,14 +15,10 @@ router.get('/lite/search', async (req, res) => {
             const products = localDB.getAll('products');
 
             const liteProducts = products.slice(0, 100).map((p) => ({
-                _id: p._id,
                 name: p.name,
                 slug: p.slug,
                 category: p.category,
                 subcategory: p.subcategory,
-                brand: p.brand,
-                price: p.price,
-                images: p.images?.[0] ? [p.images[0]] : [],
             }));
 
             return res.json(liteProducts);
@@ -31,13 +27,11 @@ router.get('/lite/search', async (req, res) => {
         const products = await Product.find(
             {},
             {
+                _id: 0,
                 name: 1,
                 slug: 1,
                 category: 1,
                 subcategory: 1,
-                brand: 1,
-                price: 1,
-                images: { $slice: 1 },
             }
         )
             .limit(100)
