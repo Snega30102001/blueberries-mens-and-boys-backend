@@ -18,6 +18,8 @@ router.get('/lite/search', async (req, res) => {
                 _id: p._id,
                 name: p.name,
                 slug: p.slug,
+                brand: p.brand,
+                price: p.price,
                 category: p.category,
                 subcategory: p.subcategory,
             }));
@@ -28,9 +30,11 @@ router.get('/lite/search', async (req, res) => {
         const products = await Product.find(
             {},
             {
-                _id: 0,
+                _id: 1,
                 name: 1,
                 slug: 1,
+                brand: 1,
+                price: 1,
                 category: 1,
                 subcategory: 1,
             }
