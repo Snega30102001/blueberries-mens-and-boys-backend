@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Banner = require('../models/Banner');
 const localDB = require('../utils/localDB');
+const fs = require('fs');
+const path = require('path');
 
 const isConnected = () => mongoose.connection.readyState === 1;
 
@@ -79,13 +81,32 @@ router.delete('/:id', async (req, res) => {
             localDB.delete('banners', req.params.id);
             return res.json({ message: 'Banner removed' });
         }
+
         const banner = await Banner.findById(req.params.id);
+
         if (banner) {
+
+            // Delete image file
+            if (banner.image) {
+                const imagePath = path.join(
+                    __dirname,
+                    '..',
+                    banner.image
+                );
+
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
             await banner.deleteOne();
+
             res.json({ message: 'Banner removed' });
+
         } else {
             res.status(404).json({ message: 'Banner not found' });
         }
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

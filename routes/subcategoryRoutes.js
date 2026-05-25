@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Subcategory = require('../models/Subcategory');
 const localDB = require('../utils/localDB');
+const fs = require('fs');
+const path = require('path');
 
 const isConnected = () => mongoose.connection.readyState === 1;
 
@@ -56,20 +58,54 @@ router.put('/:id', async (req, res) => {
 
 // Delete subcategory
 router.delete('/:id', async (req, res) => {
+
     try {
+
         if (!isConnected()) {
+
             localDB.delete('subcategories', req.params.id);
-            return res.json({ message: 'Subcategory removed' });
+
+            return res.json({
+                message: 'Subcategory removed'
+            });
         }
+
         const subcategory = await Subcategory.findById(req.params.id);
+
         if (subcategory) {
+
+            // Delete image if exists
+            if (subcategory.image) {
+
+                const imagePath = path.join(
+                    __dirname,
+                    '..',
+                    subcategory.image
+                );
+
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
             await subcategory.deleteOne();
-            res.json({ message: 'Subcategory removed' });
+
+            res.json({
+                message: 'Subcategory removed'
+            });
+
         } else {
-            res.status(404).json({ message: 'Subcategory not found' });
+
+            res.status(404).json({
+                message: 'Subcategory not found'
+            });
         }
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+
+        res.status(500).json({
+            message: error.message
+        });
     }
 });
 

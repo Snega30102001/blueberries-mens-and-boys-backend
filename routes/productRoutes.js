@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const localDB = require('../utils/localDB');
+const fs = require('fs');
+const path = require('path');
 
 const isConnected = () => mongoose.connection.readyState === 1;
 
@@ -50,7 +52,6 @@ router.get('/lite/search', async (req, res) => {
         });
     }
 });
-
 // Get all products
 router.get('/', async (req, res) => {
     try {
@@ -180,20 +181,74 @@ router.put('/:id', async (req, res) => {
 
 // Delete product
 router.delete('/:id', async (req, res) => {
+
     try {
+
         if (!isConnected()) {
+
             localDB.delete('products', req.params.id);
-            return res.json({ message: 'Product removed' });
+
+            return res.json({
+                message: 'Product removed'
+            });
         }
+
         const product = await Product.findById(req.params.id);
+
         if (product) {
+
+            // Delete all product images
+            if (product.images && Array.isArray(product.images)) {
+
+                product.images.forEach((image) => {
+
+                    if (!image) return;
+
+                    const imagePath = path.join(
+                        __dirname,
+                        '..',
+                        image
+                    );
+
+                    if (fs.existsSync(imagePath)) {
+                        fs.unlinkSync(imagePath);
+                    }
+
+                });
+            }
+
+            // Optional single image support
+            if (product.image) {
+
+                const imagePath = path.join(
+                    __dirname,
+                    '..',
+                    product.image
+                );
+
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
             await product.deleteOne();
-            res.json({ message: 'Product removed' });
+
+            res.json({
+                message: 'Product removed'
+            });
+
         } else {
-            res.status(404).json({ message: 'Product not found' });
+
+            res.status(404).json({
+                message: 'Product not found'
+            });
         }
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+
+        res.status(500).json({
+            message: error.message
+        });
     }
 });
 

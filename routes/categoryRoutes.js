@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Category = require('../models/Category');
 const localDB = require('../utils/localDB');
+const fs = require('fs');
+const path = require('path');
 
 // Helper to check if DB is connected
 const isConnected = () => mongoose.connection.readyState === 1;
@@ -76,17 +78,38 @@ router.put('/:id', async (req, res) => {
 // Delete category
 router.delete('/:id', async (req, res) => {
     try {
+
         if (!isConnected()) {
             localDB.delete('categories', req.params.id);
             return res.json({ message: 'Category removed' });
         }
+
         const category = await Category.findById(req.params.id);
+
         if (category) {
+
+            // Delete image file if exists
+            if (category.image) {
+
+                const imagePath = path.join(
+                    __dirname,
+                    '..',
+                    category.image
+                );
+
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
             await category.deleteOne();
+
             res.json({ message: 'Category removed' });
+
         } else {
             res.status(404).json({ message: 'Category not found' });
         }
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
