@@ -22,12 +22,10 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const allowedOrigins = [
-    'http://iqtechnology.in',         // New Frontend
-    // 'https://bluebreery-frontend-2u3j.onrender.com', // Older Render Frontend
-    // 'https://bluebreery-frontend.onrender.com',    // Possible alternate
-    'http://localhost:3000',                        // Local Development
-    'http://localhost:5001',                         // Local Backend Debug
-    // 'https://blueberries-mens-and-boys.onrender.com',
+    'https://iqtechnology.in',
+    'http://iqtechnology.in',
+    'http://localhost:3000',
+    'http://localhost:5001',
 ];
 
 app.use(cors({
